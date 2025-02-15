@@ -11,7 +11,7 @@ red = vector(1, 0, 0)
 animation = canvas(width=1000, height=800, align='center',background=color.white)
 animation.range = L
 animation.title = 'Robótica móvil'
-animation.caption = "Mapeado de trayectoria"
+animation.caption = "Mapeado probabilístico"
 
 
 animation.camera.pos = vector(L/2, L/2, L/2 + 10)  
@@ -19,8 +19,9 @@ animation.camera.pos = vector(L/2, L/2, L/2 + 10)
 
 # Dibujar el cubo
 d = L
-h = 2*d
+#h = 2*d
 r = 0.005
+
 boxbottom = curve(color=gray, radius=r)
 boxbottom.append([vector(0, 0, 0), vector(0, 0, d), vector(d, 0, d), vector(d, 0, 0), vector(0, 0, 0)])
 boxtop = curve(color=gray, radius=r)
@@ -30,30 +31,28 @@ vert1.append([vector(0, 0, 0), vector(0, d, 0)])
 vert2.append([vector(0, 0, d), vector(0, d, d)])
 vert3.append([vector(d, 0, d), vector(d, d, d)])
 vert4.append([vector(d, 0, 0), vector(d, d, 0)])
-# Parámetros
+
+
 N = 700  # Número de puntos
 N_obs = 3  # Número de obstáculos
 max_vecinos = 5  # Máximo de conexiones por nodo
 obs_radius = 2  # Radio de los obstáculos
 
-# Definir puntos de inicio y final
+# Puntos inicio y final
 inicio = np.array([5, 5, 5])
 final = np.array([0, 0, 0])
-
-# Dibujar inicio y final
 sphere(pos=vector(*final), radius=0.15, color=color.red)
 sphere(pos=vector(*inicio), radius=0.15, color=color.green)
 
-# Generar puntos y los obstaculos aleatorios en el espacio
+#Aleatorizador
 puntos = np.random.uniform(0, L, (N, 3))
 puntos = np.vstack([inicio, puntos, final]) # Concatena el inicio y final para simplificar 
 obstaculos = np.random.uniform(0, L, (N_obs, 3))
 
-# Genera los obstaculos en el mapa
 for obst in obstaculos:
     sphere(pos=vector(*obst), radius=obs_radius, color=color.gray(0.5))
 
-# Genera los puntos en el mapa
+# Generador de puntos aleatorios en el mapa
 esferas = []
 for punto in puntos:
     color_punto = color.green if np.all(punto == inicio) else color.red if np.all(punto == final) else color.blue
@@ -64,8 +63,8 @@ def colision_libre(p1, p2):
     for obs in obstaculos:
         d = np.linalg.norm(np.cross(p2 - p1, obs - p1)) / np.linalg.norm(p2 - p1)
         if d < obs_radius:
-            return False  # Colisión detectada
-    return True  # Conexión válida
+            return False  
+    return True  
 
 # 
 grafo = {tuple(p): [] for p in puntos}
